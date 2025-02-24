@@ -15,10 +15,8 @@ First, open **VS Code** and **open the terminal** (`Ctrl + ~` on Windows/Linux, 
 Run the following command in the terminal to clone the repository:
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/YOUR-REPO-NAME.git
+git clone https://github.com/krisjanisdz/person-guesser.git
 ```
-
-Replace `YOUR-USERNAME` and `YOUR-REPO-NAME` with the actual GitHub repository URL.
 
 Then, navigate into the project folder:
 
