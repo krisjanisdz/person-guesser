@@ -76,7 +76,7 @@ Replace `your_mongodb_connection_string` with the actual MongoDB **connection st
 Run:
 
 ```bash
-npm start
+node index.js
 ```
 
 If everything is working, you should see:
@@ -120,7 +120,7 @@ Local: http://localhost:5173/
 | Command                    | Description                           |
 |----------------------------|---------------------------------------|
 | `npm install`              | Install dependencies                  |
-| `npm start`                | Start the backend server              |
+| `node index.js`            | Start the backend server              |
 | `npm run dev`              | Start the frontend development server |
 | `git push`                 | Share your contribution               |
 | `git pull origin main`     | Get the latest updates from GitHub    |
