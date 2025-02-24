@@ -1,0 +1,11 @@
+# Ignore environment variables
+back-end/.env
+latvian-guesser/.env
+
+# Node.js dependencies
+node_modules/
+back-end/node_modules/
+latvian-guesser/node_modules/
+
+# Logs
+*.log
