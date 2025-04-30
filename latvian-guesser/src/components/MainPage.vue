@@ -109,6 +109,7 @@
 }
 .card{
   padding: 10px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .right-col{
