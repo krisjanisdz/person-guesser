@@ -1,29 +1,23 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import LandingPage from '../components/LandingPage.vue';
-import HelloWorld from '../components/HelloWorld.vue';
 import AdminMain from '../components/admin/AdminMain.vue';
 import MainPage from '../components/MainPage.vue';
 import NotFound from '../components/NotFound.vue';
 import AddPerson from '../components/admin/AddPerson.vue';
 import AddCategory from '../components/admin/AddCategory.vue';
 import GuestPage from '../components/GuestPage.vue';
-import RegisterPage from '../components/RegisterPage.vue';
+import RegisterPage from '../components/user/RegisterPage.vue';
+import UserMain from '../components/user/UserMain.vue';
 
 const routes = [
-  {
-    path: '/land',
-    name: 'LandingPage',
-    component: LandingPage,
-  },
-  {
-    path: '/hello2',
-    name: 'HelloWorld',
-    component: HelloWorld,
-  },
   {
     path: '/',
     name: 'MainPage',
     component: MainPage,
+  },
+  {
+    path: '/user',
+    name: 'UserMain',
+    component: UserMain,
   },
   {
     path: '/admin',

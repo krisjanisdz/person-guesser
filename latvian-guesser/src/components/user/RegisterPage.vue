@@ -9,8 +9,8 @@
   </template>  
   
   <script>
-  import Header from './Header.vue';
-  import Footer from './Footer.vue';
+  import Header from '../Header.vue';
+  import Footer from '../Footer.vue';
   
   export default {
     name: 'GuestPage',
