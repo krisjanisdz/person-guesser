@@ -2,22 +2,57 @@
     <div class="page">
       <Header />
       <main class="main">
-        <h1 class="welcome">Laipni lūdzam!</h1>
+        <h1 class="welcome">Vai spēsi uzminēt latvieti?</h1>
         <div class="cards">
-          <div class="card" v-for="card in cards" :key="card.title">
-            <div class="card-icon">
-              <div class="info-icon">i</div>
-            </div>
-            <div class="card-title">
-              <h2>{{ card.title }}</h2>
-            </div>
-            <div class="card-description">
-              <p>{{ card.description }}</p>
-            </div>
-            <div class="card-button">
-              <button>Doties</button>
+
+          <!-- Tas cards tiks pārtaisīts, kā atsevišķa komponente, savādāk pārāk daudz kods -->
+          <div class="left-col">
+            <div v-if="cards[0]" :key="cards[0].title" :class="`${cards[0].cardClass}`">   
+              <div class="card-icon">
+                <div class="info-icon">i</div>
+              </div>
+              <div class="card-title">
+                <h2>{{ cards[0].title }}</h2>
+              </div>
+              <div class="card-description">
+                <p>{{ cards[0].description }}</p>
+              </div>
+              <div class="card-button">
+                <button>Doties</button>
+              </div>
             </div>
           </div>
+          <div class="right-col">
+              <div v-if="cards[1]" :key="cards[1].title" :class="`${cards[1].cardClass}`">
+                <div class="card-icon">
+                  <div class="info-icon">i</div>
+                </div>
+                <div class="card-title">
+                  <h2>{{ cards[1].title }}</h2>
+                </div>
+                <div class="card-description">
+                  <p>{{ cards[1].description }}</p>
+                </div>
+                <div class="card-button">
+                  <button>Doties</button>
+                </div>
+              </div>
+              <div v-if="cards[2]" :key="cards[2].title" :class="`${cards[2].cardClass}`">
+                <div class="card-icon">
+                  <div class="info-icon">i</div>
+                </div>
+                <div class="card-title">
+                  <h2>{{ cards[2].title }}</h2>
+                </div>
+                <div class="card-description">
+                  <p>{{ cards[2].description }}</p>
+                </div>
+                <div class="card-button">
+                  <button>Doties</button>
+                </div>
+              </div>
+          </div>
+
         </div>
       </main>
       <Footer />
@@ -37,9 +72,9 @@
     data() {
       return {
         cards: [
-          { title: 'Spēles režīms', description: 'Izvēlies spēles režīmu un uzsāc jautru minēšanas izaicinājumu!' },
-          { title: 'Spēļu vēsture', description: 'Detalizēta informācija par iepriekš spēlētajām spēlēm – rezultāti, punkti un datumi' },
-          { title: 'Profils', description: 'Veido savu spēlētāja identitāti – profils, avatārs un personīgie dati vienuviet' }
+          { cardClass: 'card play', title: 'Uzmini latvieti!', description: 'Izvēlies spēles režīmu un uzsāc jautru minēšanas izaicinājumu!' },
+          { cardClass: 'card create_profile', title: 'Neesi vēl izveidojis profilu?', description: 'Reģistrējies, lai izvēlētos spēļu režīmus, saglabātu savas iepriekšējās spēles un sekotu līdzi progresam!' },
+          { cardClass: 'card play_as_guest', title: 'Spēlē kā viesis', description: 'Spēlē “Uzmini latvieti” bez profila ar nejauši iedalītu spēles režīmu.' }
         ]
       };
     }
@@ -72,18 +107,30 @@
   gap: 4rem;
   padding-bottom: 70px;
 }
+.card{
+  padding: 10px;
+}
 
-.card {
-  background-color: white;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  width: 240px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+.right-col{
   display: flex;
   flex-direction: column;
-  align-items: left;
-  position: relative; 
+  row-gap: 1ch;
+}
+
+.play {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background-color: #C5ABB1;
+  border-radius: 10px;
+  height: 100%;
+}
+
+.create_profile,
+.play_as_guest {
+  background-color: #C5ABB1;
+  flex: 1;
+  border-radius: 12px;
 }
 
 .card:hover {
@@ -119,20 +166,20 @@
 }
 
 .card-button {
+  display: flex;
   margin-top: auto; 
-  margin-bottom: 5px; 
   width: 100%; 
+  justify-content: flex-end;
 }
 
 .card-button button {
-  background-color: #d3c7c7;
-  color: rgb(0, 0, 0);
-  border: 1px solid black;
+  background-color: #2c2c2c;
+  color: rgb(255, 255, 255);
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
   cursor: pointer;
   font-size: 1rem;
-  width: 100%;
+  width: 50%;
 }
 
 .card-button button:hover {

@@ -6,6 +6,8 @@ import MainPage from '../components/MainPage.vue';
 import NotFound from '../components/NotFound.vue';
 import AddPerson from '../components/admin/AddPerson.vue';
 import AddCategory from '../components/admin/AddCategory.vue';
+import GuestPage from '../components/GuestPage.vue';
+import RegisterPage from '../components/RegisterPage.vue';
 
 const routes = [
   {
@@ -32,6 +34,16 @@ const routes = [
     path: '/:pathMatch(.*)*', 
     name: 'NotFound',
     component: NotFound,
+  },
+  {
+    path: '/guest',
+    name: 'GuestPage',
+    component: GuestPage,
+  },
+  {
+    path: '/register',
+    name: 'RegisterPage',
+    component: RegisterPage,
   },
   {
     path: '/add',
