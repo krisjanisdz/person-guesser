@@ -7,6 +7,7 @@ import AddCategory from '../components/admin/AddCategory.vue';
 import GuestPage from '../components/GuestPage.vue';
 import RegisterPage from '../components/user/RegisterPage.vue';
 import UserMain from '../components/user/UserMain.vue';
+import Game from '../components/Game.vue';
 
 const routes = [
   {
@@ -38,6 +39,11 @@ const routes = [
     path: '/register',
     name: 'RegisterPage',
     component: RegisterPage,
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'Game',
+    component: Game,
   },
   {
     path: '/add',

@@ -18,7 +18,7 @@
                 <p>{{ cards[0].description }}</p>
               </div>
               <div class="card-button">
-                <button>Doties</button>
+                <button @click="goToGame">Doties</button>
               </div>
             </div>
           </div>
@@ -77,6 +77,11 @@
           { cardClass: 'card play_as_guest', title: 'Spēlē kā viesis', description: 'Spēlē “Uzmini latvieti” bez profila ar nejauši iedalītu spēles režīmu.' }
         ]
       };
+    },
+    methods: {
+      goToGame() {
+        this.$router.push({ name: 'Game' });
+      }
     }
   };
   </script>
