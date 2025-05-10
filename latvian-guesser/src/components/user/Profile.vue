@@ -2,18 +2,18 @@
     <div class="page">
       <Header />
       <main class="main">
-        <h1 class="welcome">Page not found!</h1>
+        <h1 class="welcome"> Profils</h1>
       </main>
       <Footer />
     </div>
   </template>  
   
   <script>
-  import Header from './Header.vue';
-  import Footer from './Footer.vue';
+  import Header from '../Header.vue';
+  import Footer from '../Footer.vue';
   
   export default {
-    name: 'NotFoundPage',
+    name: 'Profile',
     components: {
       Header,
       Footer

@@ -54,28 +54,41 @@
         register_success: false
       }
     },
-    methods:{
+    methods: {
       async register(){ 
         if(this.loading) return;
-        this.loading = true;   // locking button
+        this.loading = true;
+        this.error_message = '';
+        this.register_success = false;
 
-        const res = await fetch('http://localhost:3001/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username: this.username, email: this.email, password: this.password, passwordAgain: this.password_again}),
+        try {
+          const res = await fetch('http://localhost:3001/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              username: this.username,
+              email: this.email,
+              password: this.password,
+              passwordAgain: this.password_again
+            }),
           });
-          
-        const data = await res.json()
-        console.log(data)
-        if(data.success){
-          this.register_success = true
-        }else{
-          this.error_message = data.message;
+
+          const data = await res.json();
+          console.log(data);
+
+          if (res.ok && data.token) {
+            // Save token and redirect
+            localStorage.setItem('token', data.token);
+            this.$router.push('/user');
+          } else {
+            this.error_message = data.message || 'Reģistrācija neizdevās.';
+          }
+        } catch (err) {
+          this.error_message = 'Tīkls vai servera kļūda.';
         }
-        
+
         this.loading = false;
-      },
-      
+      }
     }
   };
   </script>
@@ -124,7 +137,8 @@
 #register-btn{
   background-color: white;
   color: #2c2c2c;
-  width: 50%;
+  width: 100%;
+  padding: 10px;
 }
 
 #submit-btn:hover{
@@ -135,13 +149,22 @@
 }
 form button {
   border-radius: 5px;
-  padding: 4px;
+  padding: 10px;
 }
 .register{
   display: flex;
   flex-direction: column;
   align-items: flex-end;
 }
+
+#password-input-again{
+  margin-bottom: 10px;
+}
+
+label { 
+ font-weight: bold;
+}
+
 
 
 </style>  

@@ -29,7 +29,7 @@
   import Footer from '../Footer.vue';
   
   export default {
-    name: 'AdminMain',
+    name: 'UserMain',
     components: {
       Header,
       Footer
@@ -37,7 +37,7 @@
     data() {
       return {
         cards: [
-          { title: 'Spēles režīms', description: 'Izvēlies spēles režīmu un uzsāc jautru minēšanas izaicinājumu!' },
+          { title: 'Personu kategorija', description: 'Izvēlies personu kategoriju un uzsāc jautru minēšanas izaicinājumu!' },
           { title: 'Spēļu vēsture', description: 'Detalizēta informācija par iepriekš spēlētajām spēlēm – rezultāti, punkti un datumi' },
           { title: 'Profils', description: 'Veido savu spēlētāja identitāti – profils, avatārs un personīgie dati vienuviet' }
         ]
@@ -45,10 +45,13 @@
     },
     methods: {
     navigate(title) { // SEIT BUS JAIZMAINA PATHI, KAD TIKS IZVEIDOTAS PAREJAS LAPAS
-      if (title === 'Pievienot jaunu personību') {
-        this.$router.push('/add/person');
-      } else if (title === 'Izveidot jaunu kategoriju') {
-        this.$router.push('/add/category');
+      if (title === 'Personu kategorija') {
+        this.$router.push('/categories');
+      } else if (title === 'Spēļu vēsture') {
+        this.$router.push('/history');
+      }
+      else if (title === 'Profils') {
+        this.$router.push('/profile');
       }
     }
   }

@@ -8,6 +8,9 @@ import GuestPage from '../components/GuestPage.vue';
 import RegisterPage from '../components/user/RegisterPage.vue';
 import UserMain from '../components/user/UserMain.vue';
 import LoginPage from '../components/user/LoginPage.vue';
+import Categories from '../components/user/Categories.vue';
+import History from '../components/user/History.vue';
+import Profile from '../components/user/Profile.vue';
 import Game from '../components/Game.vue';
 
 const routes = [
@@ -51,6 +54,26 @@ const routes = [
     path: '/login',
     name: 'LoginPage',
     component: LoginPage,
+  },
+  {
+    path: '/game',
+    name: 'UserGamePage',
+    component: Game,
+  },
+  {
+    path: '/categories',
+    name: 'Categories',
+    component: Categories,
+  },
+  {
+    path: '/history',
+    name: 'HistoryPage',
+    component: History,
+  },
+  {
+    path: '/profile',
+    name: 'Profile',
+    component: Profile,
   },
   {
     path: '/add',

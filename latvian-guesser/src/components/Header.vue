@@ -3,7 +3,7 @@
       <div class="logo">
         <!-- Your logo SVG or image -->
       </div>
-      <div class="title">
+      <div class="title" @click="handleTitleClick">
         UZMINI LATVIETI
       </div>
       <nav class="nav-links">
@@ -70,6 +70,14 @@
           this.$router.push('/');
         }
       },
+      handleTitleClick() {
+      const isLoggedIn = !!localStorage.getItem('token');
+      if (isLoggedIn) {
+        this.$router.push('/user');
+      } else {
+        this.$router.push('/');
+      }
+    },
     },
   };
 </script>
@@ -102,7 +110,7 @@
 }
 
 .nav-links a:hover {
-  transform: scale(1.1);
+  color:#333
 }
 
 .logout-button {
@@ -117,8 +125,8 @@
 
 .logout-button:hover {
   background-color: #a9959b;
-  transform: scale(1.1);
   box-shadow: 0 0 10px rgba(126, 30, 60, 0.8), 0 0 20px rgba(126, 30, 60, 0.4);
+  color: #333;
 }
 
 .title {
@@ -128,5 +136,6 @@
   font-size: 23px;
   font-weight: 300;
   color: white;
+  user-select: none;
 }
 </style>
