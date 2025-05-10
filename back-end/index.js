@@ -39,22 +39,25 @@ app.post('/login', async (req, res) => {
   try {
     const { user_or_email, password } = req.body;
 
-    if(user_or_email.includes('@')){   // check if email or username
-      var user = await User.findOne({ email: user_or_email });
-      console.log(user.email);
-    }else{
-      var user = await User.findOne({ username: user_or_email });
-      console.log(user.username);
+    let user;
+    if (user_or_email.includes('@')) {
+      user = await User.findOne({ email: user_or_email });
+    } else {
+      user = await User.findOne({ username: user_or_email });
     }
 
     if (!user) return res.status(401).json({ message: 'Invalid credentials' });
 
-    const passMatch = await bcrypt.compare(password, user.password);    // compare raw password to database password
-    if(!passMatch) return res.status(401).json({ message: 'Invalid credentials' });
+    console.log(`User found: ${user.username || user.email}`);
+
+    const passMatch = await bcrypt.compare(password, user.password);
+    if (!passMatch) return res.status(401).json({ message: 'Invalid credentials' });
 
     const token = jwt.sign({ userId: user._id }, secretKey);
     res.json({ token, message: 'Login successful' });
+
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: 'Error posting login info' });
   }
 });
@@ -86,8 +89,10 @@ app.post('/register', async (req, res) => {
     const newUser = new User({username, email, password: passwordHash, isAdmin: false});
     console.log(newUser);
 
-    await newUser.save()
-    res.status(201).json({ message: 'New user created', success: true });
+    await newUser.save();
+    const token = jwt.sign({ userId: newUser._id }, secretKey);
+    res.status(201).json({ message: 'New user created', success: true, token });
+
   } catch (err) {
     res.status(500).json({ error: 'Error posting register info', error:err.message });
   }
@@ -135,7 +140,7 @@ const testPeople = [
   seedDatabase();
   */
 
-/*
+
   const testUsers = [
     {
       username: "antons123",
@@ -148,15 +153,24 @@ const testPeople = [
       password: "0000"
     },
   ]
-*/
-const seedDatabase = async () => {   // delete all users
+
+const deleteDatabaseUsers = async () => {   // delete all users
   try {
     await User.deleteMany(); // Clear existing data
-    // await User.insertMany(testUsers);
-    console.log('Test data inserted successfully!');
+    console.log('Test data deleted successfully!');
+  } catch (err) {
+    console.error('Error deleted test data:', err);
+  }
+};
+
+const seedDatabaseWithUsers = async () => { // add all users
+  try {
+    await User.insertMany(testUsers);
+    console.log('Test data deleted successfully!');
   } catch (err) {
     console.error('Error inserting test data:', err);
   }
 };
 
-seedDatabase();
+//deleteDatabaseUsers();
+//seedDatabaseWithUsers();

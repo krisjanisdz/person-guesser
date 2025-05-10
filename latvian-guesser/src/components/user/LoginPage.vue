@@ -65,6 +65,7 @@
           localStorage.setItem('token', data.token);
           this.success_message = 'Login successful!';
           this.$router.push('/user');
+          console.log(data.token)
           } else if(data.message === "Invalid credentials"){
             this.success_message = "Nepareizs lietotājvārds un/vai parole";
           }
@@ -117,6 +118,7 @@
 }
 
 #submit-btn{
+  padding: 10px;
   background-color: #2c2c2c;
   color: white;
   margin-bottom: 15px;
@@ -135,7 +137,7 @@
 }
 form button {
   border-radius: 5px;
-  padding: 4px;
+  padding: 10px;
 }
 .register{
   display: flex;
@@ -143,5 +145,16 @@ form button {
   align-items: center;
 }
 
+#password-input {
+  margin-bottom: 10px;
+}
 
+.register p {
+  margin-bottom: 10px;
+  
+}
+
+label {
+  font-weight: bold;
+}
 </style>  
