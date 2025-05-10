@@ -18,7 +18,9 @@
                 <p>{{ descr }}</p>
               </div>
               <div class="card-button">
+
                 <button @click="navToLogin">Doties</button>
+
               </div>
             </div>
           </div>

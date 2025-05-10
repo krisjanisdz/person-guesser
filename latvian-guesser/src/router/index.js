@@ -8,6 +8,7 @@ import GuestPage from '../components/GuestPage.vue';
 import RegisterPage from '../components/user/RegisterPage.vue';
 import UserMain from '../components/user/UserMain.vue';
 import LoginPage from '../components/user/LoginPage.vue';
+import Game from '../components/Game.vue';
 
 const routes = [
   {
