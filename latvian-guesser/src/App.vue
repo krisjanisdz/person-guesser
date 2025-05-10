@@ -10,6 +10,12 @@
 <script>
 export default {
   name: 'App',
+  computed: {
+    // Computed property to check if token exists in localStorage
+    isLoggedIn() {
+      return !!localStorage.getItem('token'); 
+    }
+  },
 };
 </script>
 
