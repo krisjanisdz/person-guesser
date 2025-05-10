@@ -7,6 +7,7 @@ import AddCategory from '../components/admin/AddCategory.vue';
 import GuestPage from '../components/GuestPage.vue';
 import RegisterPage from '../components/user/RegisterPage.vue';
 import UserMain from '../components/user/UserMain.vue';
+import LoginPage from '../components/user/LoginPage.vue';
 
 const routes = [
   {
@@ -18,11 +19,17 @@ const routes = [
     path: '/user',
     name: 'UserMain',
     component: UserMain,
+    meta: {
+      requiresAuth: true  // Route accessed only if authorized
+    }
   },
   {
     path: '/admin',
     name: 'AdminMain',
     component: AdminMain,
+    meta: {
+      requiresAuth: true  // Route accessed only if authorized
+    }
   },
   {
     path: '/:pathMatch(.*)*', 
@@ -38,6 +45,11 @@ const routes = [
     path: '/register',
     name: 'RegisterPage',
     component: RegisterPage,
+  },
+  {
+    path: '/login',
+    name: 'LoginPage',
+    component: LoginPage,
   },
   {
     path: '/add',
@@ -60,6 +72,23 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
+});
+
+router.beforeEach((to, from, next) => {
+  if (to.meta.requiresAuth) {
+    const token = localStorage.getItem('token');
+    if (token) {
+      console.log(token)
+      // User is authenticated, proceed to the route
+      next();
+    } else {
+      // User is not authenticated, redirect to login
+      next('/login');
+    }
+  } else {
+    // Non-protected route, allow access
+    next();
+  }
 });
 
 export default router;

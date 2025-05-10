@@ -39,7 +39,7 @@
     },
     methods: {
       updateHeaderContent(path) {
-        if (path === '/' || path === '/login') {
+        if (path === '/' || path === '/login' || path === '/register') {
           this.pageTitle = 'UZMINI LATVIETI';
           this.navLinks = [];
           this.buttonText = 'Pieslēgties';
@@ -66,6 +66,7 @@
         if (this.buttonText === 'Pieslēgties') {
           this.$router.push('/login');
         } else {
+          localStorage.removeItem('token');
           this.$router.push('/');
         }
       },

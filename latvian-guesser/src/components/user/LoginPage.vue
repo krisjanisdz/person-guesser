@@ -2,30 +2,28 @@
     <div class="page">
       <Header />
       <main class="main">
-        <h2 class="title">Reģistrējies</h2>
+        <h2 class="title">Pieslēdzies</h2>
         <form action="" class = "login-form">
-            <label for="first">Ievadiet lietotājvārdu: *</label>
+            <label for="first">Ievadiet lietotājvārdu vai e-pastu:</label>
 
-            <input type="text" v-model="username" id="username-input" placeholder="Lietotājvārds">
+            <input type="text" v-model="user_or_email" id="user-input" placeholder="Lietotājvārds vai e-pasts">
 
-            <label for="first">Ievadiet e-pastu: *</label>
-
-            <input type="text" v-model="email" id="email-input" placeholder="e-pasts">
-
-            <label for="password">Ievadiet paroli: *</label>
+            <label for="password">Ievadiet paroli:</label>
 
             <input type="password" v-model="password" id="password-input" placeholder="Parole">
 
-            <input type="password" v-model="password_again" id="password-input-again" placeholder="Parole atkārtoti">
-
-            <div v-if="error_message" class="error-message">{{ error_message }}</div>
-
-            <button @click="register" type="submit" id="submit-btn" :disabled="loading">
-              {{ loading ? 'Notiek reģistrēšanās...' : 'Reģistrēties' }}
+            <button @click="login" type="submit" id="submit-btn" :disabled="loading">
+              {{ loading ? 'Notiek pieslēgšanās...' : 'Pieslēgties' }}
             </button>
 
-            <label>{{ register_success ? 'Reģistrēšanās veiksmīga!' : '' }}</label>
+            <div v-if="success_message" class="error-message">{{ success_message }}</div>
 
+            <div class="register">
+              <p>Nav profils? Piereģistrējies!</p>
+              <button @click="navToRegister" type="submit" id="register-btn">
+                    Reģistrēties
+                </button>
+            </div>
 
         </form>
       </main>
@@ -45,36 +43,37 @@
     },
     data() {
       return{
-        username: '',
-        email: '',
+        user_or_email: '',
         password: '',
-        password_again: '',
         loading: false,
-        error_message: '',
-        register_success: false
+        success_message: ''
       }
     },
     methods:{
-      async register(){ 
+      async login(){ 
         if(this.loading) return;
-        this.loading = true;   // locking button
+        this.loading = true;
 
-        const res = await fetch('http://localhost:3001/register', {
+        const res = await fetch('http://localhost:3001/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username: this.username, email: this.email, password: this.password, passwordAgain: this.password_again}),
+          body: JSON.stringify({ user_or_email: this.user_or_email, password: this.password }),
           });
-          
+
         const data = await res.json()
-        console.log(data)
-        if(data.success){
-          this.register_success = true
-        }else{
-          this.error_message = data.message;
-        }
+          if (data.token) {
+          localStorage.setItem('token', data.token);
+          this.success_message = 'Login successful!';
+          this.$router.push('/user');
+          } else if(data.message === "Invalid credentials"){
+            this.success_message = "Nepareizs lietotājvārds un/vai parole";
+          }
         
         this.loading = false;
       },
+      navToRegister(){
+        this.$router.push('/register');
+      }
       
     }
   };
@@ -112,6 +111,7 @@
 .login-form input{
   width: 100%;
 }
+
 .error-message{
   color: red;
 }
@@ -124,7 +124,7 @@
 #register-btn{
   background-color: white;
   color: #2c2c2c;
-  width: 50%;
+  width: 40%;
 }
 
 #submit-btn:hover{
@@ -140,7 +140,7 @@ form button {
 .register{
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
 }
 
 

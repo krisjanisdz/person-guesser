@@ -5,7 +5,7 @@
         <h1 class="welcome">Vai spēsi uzminēt latvieti?</h1>
         <div class="cards">
 
-          <!-- Tas cards tiks pārtaisīts, kā atsevišķa komponente, savādāk pārāk daudz kods -->
+          <!-- Tas cards tiks pārtaisīts, kā atsevišķa komponente, savādāk pārāk daudz kods (moš nē, man slinkums)-->
           <div class="left-col">
             <div v-if="cards[0]" :key="cards[0].title" :class="`${cards[0].cardClass}`">   
               <div class="card-icon">
@@ -14,11 +14,11 @@
               <div class="card-title">
                 <h2>{{ cards[0].title }}</h2>
               </div>
-              <div class="card-description">
-                <p>{{ cards[0].description }}</p>
+              <div v-for="(descr, i) in cards[0].description" :key="i" class="card-description">
+                <p>{{ descr }}</p>
               </div>
               <div class="card-button">
-                <button>Doties</button>
+                <button @click="navToLogin">Doties</button>
               </div>
             </div>
           </div>
@@ -34,7 +34,7 @@
                   <p>{{ cards[1].description }}</p>
                 </div>
                 <div class="card-button">
-                  <button>Doties</button>
+                  <button @click="navToRegister">Doties</button>
                 </div>
               </div>
               <div v-if="cards[2]" :key="cards[2].title" :class="`${cards[2].cardClass}`">
@@ -48,7 +48,7 @@
                   <p>{{ cards[2].description }}</p>
                 </div>
                 <div class="card-button">
-                  <button>Doties</button>
+                  <button @click="navToGuest">Doties</button>
                 </div>
               </div>
           </div>
@@ -72,11 +72,22 @@
     data() {
       return {
         cards: [
-          { cardClass: 'card play', title: 'Uzmini latvieti!', description: 'Izvēlies spēles režīmu un uzsāc jautru minēšanas izaicinājumu!' },
+          { cardClass: 'card play', title: 'Uzmini latvieti!', description: ['Izvēlies spēles režīmu un uzsāc jautru minēšanas izaicinājumu!', 'Plašs slavenību klāsts ar vairākiem spēles režīmiem!', 'Varbūt tā ir Šomase? A, ja nu tomēr Reiniks? Mini un uzzini!'] },
           { cardClass: 'card create_profile', title: 'Neesi vēl izveidojis profilu?', description: 'Reģistrējies, lai izvēlētos spēļu režīmus, saglabātu savas iepriekšējās spēles un sekotu līdzi progresam!' },
           { cardClass: 'card play_as_guest', title: 'Spēlē kā viesis', description: 'Spēlē “Uzmini latvieti” bez profila ar nejauši iedalītu spēles režīmu.' }
         ]
       };
+    },
+    methods:{
+      navToRegister(){
+        this.$router.push('/register');
+      },
+      navToGuest(){
+        this.$router.push('/guest');
+      },
+      navToLogin(){
+        this.$router.push('/login');
+      }
     }
   };
   </script>
@@ -97,7 +108,7 @@
     text-align: center;
     padding: 50px;
     font-size: 70px;
-    font-weight: 600;
+    font-weight: bold;
 }
 
 .cards {
@@ -158,12 +169,17 @@
 
 .card-title {
   margin-bottom: 0.5rem;
-  font-size: 21px;
-  font-weight: 600;
+  font-size: 30px;
+  font-weight: 650;
 }
 
 .card-description {
+  display: flex;
   margin-bottom: 1rem;
+  margin-top: 10px;
+  gap: 30px;
+  font-size: 20px;
+  font-weight: 400;
 }
 
 .card-button {
@@ -184,7 +200,7 @@
 }
 
 .card-button button:hover {
-  background-color: #a33a3a;
+  background-color: #961C2F;
   color: white;
 }
 
@@ -197,7 +213,8 @@ button {
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 30px;
+  font-weight: bold;
 }
 
 button:hover {
