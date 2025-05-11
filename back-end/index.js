@@ -5,7 +5,7 @@ const app = express();
 const Person  = require('./models/person');
 const User  = require('./models/user');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcrypt');
 require('dotenv').config();
 
 // Middlewares
@@ -34,6 +34,53 @@ app.get('/api/people/random', async (req, res) => {
       res.status(500).json({ error: 'Error fetching random person' });
     }
 });
+
+app.get('/api/guess', async (req, res) => {
+  const name = req.query.name;
+  if (!name) return res.status(400).json({ error: 'Name required' });
+
+  const parts = name.trim().split(' ');
+
+  const firstName = parts[0];
+  const lastName = parts.slice(1).join(' ');
+
+  try {
+    const person = await Person.findOne({
+      name: new RegExp('^' + firstName + '$', 'i'),
+      surname: new RegExp('^' + lastName + '$', 'i')
+    });
+
+    if (!person) return res.status(404).json({ error: 'Personība nav atrasta' });
+
+    res.json(person);
+  } catch (err) {
+    console.error('Error fetching person:', err);
+    res.status(500).json({ error: 'Error fetching person' });
+  }
+});
+
+
+app.get('/api/people/search', async (req, res) => {
+  const term = req.query.term;
+  if (!term) return res.json([]);
+
+  try {
+    const regex = new RegExp(term, 'i');
+    const people = await Person.find({
+      $or: [
+        { name: regex },
+        { surname: regex },
+        { $expr: { $regexMatch: { input: { $concat: ['$name', ' ', '$surname'] }, regex: regex } } }
+      ]
+    }).limit(10);
+    
+    res.json(people);
+  } catch (err) {
+    res.status(500).json({ error: 'Search error' });
+  }
+});
+
+
 
 app.post('/login', async (req, res) => {
   try {
@@ -187,23 +234,47 @@ const testPeople = [
       gender: 'Vīrietis',
       career: 'Mūziķis',
       region: 'Vidzeme',
-      birthYear: '1943-04-20',
+      birthYear: '1943',
     },
     {
       name: 'Kristaps',
       surname : 'Porziņģis',
       image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Kristaps_Porzingis.jpg/250px-Kristaps_Porzingis.jpg',
-      description: 'A professional Latvian basketball player who has played in the NBA for teams like the New York Knicks and Boston Celtics.',
+      gender: 'Vīrietis',
+      career: 'Sportists',
+      region: 'Kurzeme',
+      birthYear: '1995',
     },
     {
       name: 'Rainis',
       surname : '',
       image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Rainis.jpg/250px-Rainis.jpg',
-      description: 'A legendary Latvian poet, playwright, and politician, considered one of the most influential figures in Latvian literature.',
-    }
+      gender: 'Vīrietis',
+      career: 'Dzejnieks',
+      region: 'Vidzeme',
+      birthYear: '1865',
+    },
+    {
+      name: 'Aminata',
+      surname: 'Savadogo',
+      image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Aminata_Savadogo_2015.jpg/440px-Aminata_Savadogo_2015.jpg',
+      gender: 'Sieviete',
+      career: 'Mūziķis',
+      region: 'Vidzeme',
+      birthYear: 1993,
+    },
+    {
+      name: 'Dāvis',
+      surname: 'Bertāns',
+      image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Davis_Bertans_2021.jpg/440px-Davis_Bertans_2021.jpg',
+      gender: 'Vīrietis',
+      career: 'Sportists',
+      region: 'Vidzeme',
+      birthYear: 1992,
+    }  
   ];
   
-
+*/
   const seedDatabase = async () => {
     try {
       await Person.deleteMany(); // Clear existing data
@@ -214,10 +285,8 @@ const testPeople = [
     }
   };
   
-  seedDatabase();
-  */
-
-
+  //seedDatabase();
+  
   const testUsers = [
     {
       username: "antons123",

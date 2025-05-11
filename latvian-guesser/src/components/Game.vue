@@ -2,7 +2,7 @@
   <div class="page">
     <Header />
     <main class="main">
-      <h1 class="welcome">Uzmini šodienas personību!</h1>
+      <h1 class="welcome" v-if="correct">Uzmini šodienas personību!</h1>
 
       <div class="guess-box">
         <div class = "guess-box-header">
@@ -16,6 +16,7 @@
                 <h2><strong>Kā spēlēt?</strong></h2>
                 <p class="mt-2">
                   Uzraksti latviešu personības vārdu un spied <strong>“Minēt”</strong>. Spēle salīdzinās tavu minējumu ar šodienas noslēpto personību.
+                  <strong>Raksti personības pilno vārdu, ja nav izņēmumi, piemēram, Rainis</strong>
                 </p>
                 <ul class="help-list mt-4">
                   <li><span class="legend green"></span> - atribūts ir <strong>pareizs</strong></li>
@@ -28,12 +29,43 @@
         <form class="input-group" @submit.prevent="makeGuess">
           <input 
           v-model="guessInput" 
+          :disabled = "gameEnded"
+          @input = "fetchSuggestion"
+          @keydown.down.prevent="moveHighlight(1)"
+          @keydown.up.prevent="moveHighlight(-1)"
+          @keydown.enter = "handleEnter"
           type="text" 
           placeholder="Raksti personības vārdu ..." 
+          autocomplete = "off"
           />
-          <button @click="makeGuess">Minēt</button>
-          </form>
+          <ul v-if="suggestions.length" class="suggestions-list">
+          <li 
+            v-for="(person, i) in suggestions" 
+            :key="person._id" 
+            :class="{active: i === highlightIndex}"
+            @click="selectSuggestion(person.name + ' ' + person.surname)"
+          >
+            {{ person.name }} {{ person.surname }}
+            </li>
+          </ul>
+          <button type="submit" :disabled = "gameEnded">Minēt</button>
+      </form>
+    </div>
+
+    <div v-if="gameEnded" class="play-again-wrapper">
+      <button @click="restartGame">Spēlēt vēlreiz</button>
+    </div>
+
+    <div v-if="showWinModal" class="modal-backdrop">
+      <div class="modal win-modal">
+        <button class="close-button" @click="showWinModal = false">X</button>
+        <h2>Tu uzminēji pareizi!</h2>
+        <p>Vai vēlies spēlēt vēlreiz?</p>
+        <div class="modal-buttons">
+          <button @click="restartGame">Spēlēt vēlreiz</button>
+        </div>
       </div>
+    </div>
 
     <div class="guess-results" v-if="guesses.length > 0">
     <table>
@@ -50,9 +82,11 @@
         <tr v-for="(guess, index) in guesses" :key="index">
           <td><img :src="guess.image" class="avatar" /></td>
           <td :class="['guess-cell', getColor(guess.gender, correct.gender)]">{{ guess.gender }}</td>
-          <td :class="['guess-cell', getColor(guess.profession, correct.profession)]">{{ guess.profession }}</td>
+          <td :class="['guess-cell', getColor(guess.career, correct.career)]">{{ guess.career }}</td>
           <td :class="['guess-cell', getColor(guess.region, correct.region)]">{{ guess.region }}</td>
-          <td :class="['guess-cell', getYearColor(guess.year)]">{{ guess.year }}</td>
+          <td :class="['guess-cell', getYearHint(guess.birthYear).class]">
+          {{ guess.birthYear }} <span class="arrow">{{ getYearHint(guess.birthYear).hint }}</span>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -75,43 +109,140 @@ export default {
   data() {
     return {
       guessInput: '',
+      suggestions: [],
+      highlightIndex: -1,
       guesses: [],
+      correct: null,
       showHelp: false,
-      // TODO: no backend ielādēt šodienas personību 
-      correct: {
-        gender: 'Vīrietis',
-        profession: 'Sportists',
-        region: 'Vidzeme',
-        year: 1990
-      }
-    };
+      showSuccess: false,
+      showWinModal: false,
+      gameEnded: false
+      };
+    },
+  mounted() {
+    this.fetchRandomPerson();
   },
   methods: {
-    makeGuess() {
-      if (!this.guessInput.trim()) return;
 
-      // TODO: aizstāt ar backend pieprasījumu uz personibas datiem
-      const fakeGuess = {
-        image: 'https://via.placeholder.com/40', // aizvietot ar reālu attēlu no db
-        gender: 'Vīrietis',
-        profession: 'Sportists',
-        region: 'Kurzeme',
-        year: 1992
-      };
-
-      this.guesses.unshift(fakeGuess);
-      this.guessInput = '';
+    async fetchSuggestion(){
+      if (this.guessInput.trim().length < 2){
+        this.suggestions = [];
+        return;
+      }
+      try {
+        const res = await fetch (`http://localhost:3001/api/people/search?term=${this.guessInput}`);
+        this.suggestions = await res.json();
+      }catch (err) {
+        console.error('Error fetching suggestions:', err);
+      }
     },
+
+    selectSuggestion(fullName) {
+      this.guessInput = fullName;
+      this.suggestions = [];
+      this.highlightIndex = -1;
+    },
+
+    async restartGame() {
+      this.guesses = [];
+      this.guessInput = '';
+      this.showSuccess = false;
+      this.showWinModal = false;
+      this.gameEnded = false;
+      await this.fetchRandomPerson();
+    },
+
+    async fetchRandomPerson() {
+      try {
+        const response = await fetch('http://localhost:3001/api/people/random');
+        if (!response.ok) throw new Error('Network response error');
+        this.correct = await response.json();
+      } catch (error) {
+        console.error('Error fetching random person:', error);
+      }
+    },
+
+    async makeGuess() {
+      const trimmed = this.guessInput.trim();
+      if (!trimmed) return;
+
+      try {
+        const encodedName = encodeURIComponent(trimmed);
+        const res = await fetch(`http://localhost:3001/api/guess?name=${encodedName}`);
+
+        if (!res.ok) {
+          alert('Personība netika atrasta');
+          return;
+        }
+
+        const person = await res.json();
+        this.guesses.unshift(person);
+
+        const isCorrect =
+          person.name === this.correct.name &&
+          person.surname === this.correct.surname &&
+          person.gender === this.correct.gender &&
+          person.career === this.correct.career &&
+          person.region === this.correct.region &&
+          person.birthYear === this.correct.birthYear;
+
+        if (isCorrect) {
+          this.showSuccess = true;
+          this.showWinModal = true;
+          this.gameEnded = true;
+          this.suggestions = [];
+        }
+
+        this.guessInput = '';
+      } catch (error) {
+        console.error('Error making guess:', error);
+      }
+    },
+
     getColor(value, correctValue) {
       return value === correctValue ? 'correct' : 'incorrect';
     },
-    getYearColor(year) {
-      const diff = Math.abs(year - this.correct.year);
-      if (year === this.correct.year) return 'correct';
-      if (diff <= 5) return 'close';
-      return 'incorrect';
-    }
+
+    getYearHint(guessYear) {
+        const correctYear = this.correct.birthYear;
+        const diff = Math.abs(guessYear - correctYear);
+
+        if (guessYear === correctYear) return { class: 'correct', hint: '' };
+
+        if (guessYear < correctYear) {
+          return { class: 'incorrect', hint: '↑' };
+        } else if (diff <= 5) {
+          const hint = guessYear < correctYear ? '↑' : '↓';
+          return { class: 'close', hint };
+        } else {
+          return { class: 'incorrect', hint: '↓' }; 
+        }
+      },
+
+    moveHighlight(step) {
+      if (!this.suggestions.length) return;
+      const max = this.suggestions.length - 1;
+
+      if (this.highlightIndex === -1) {
+        this.highlightIndex = step > 0 ? 0 : max;
+      } else {
+        this.highlightIndex = (this.highlightIndex + step + this.suggestions.length) % this.suggestions.length;
+      }
+  },
+
+  chooseHighlight() {
+    if (this.highlightIndex === -1) return;
+    const p = this.suggestions[this.highlightIndex];
+    this.selectSuggestion(p.name + ' ' + p.surname);
+  
+  },
+  handleEnter(e) {
+  if (this.suggestions.length && this.highlightIndex !== -1) {
+    e.preventDefault();        
+    this.chooseHighlight();
   }
+  }
+}
 };
 </script>
 
@@ -270,6 +401,81 @@ button:hover {
   margin-bottom: 0.5rem;
 }
 
+.success-message {
+  background-color: #a5d6a7;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-top: 1rem;
+  font-weight: bold;
+  font-size: 1.2rem;
+  text-align: center;
+}
 
+.win-modal {
+  background: #e5c9cf;
+  padding: 2rem;
+  border-radius: 12px;
+  text-align: center;
+  max-width: 400px;
+  position: relative;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+.modal-buttons {
+  margin-top: 1rem;
+}
+.modal-buttons button {
+  padding: 0.5rem 1.5rem;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.modal-buttons button:hover {
+  background-color: #388e3c;
+}
+
+.arrow {
+  font-size: larger;
+  font-weight: bold;
+  margin-left: 4px;
+}
+
+.suggestions-list {
+  position: fixed;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 400px;
+  z-index: 10;
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: 35px;
+  list-style: none;
+  padding: 0;
+}
+.suggestions-list li {
+  padding: 0.5rem;
+  cursor: pointer;
+}
+
+.suggestions-list li.active,
+.suggestions-list li:hover {
+  background-color: #e3e3e3;
+}
+
+.play-again-wrapper button {
+  padding: 0.6rem 1.6rem;
+  background-color: #4caf50;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.play-again-wrapper button:hover {
+  background:#388e3c;
+}
 
 </style>

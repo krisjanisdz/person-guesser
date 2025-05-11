@@ -7,9 +7,9 @@ const PersonSchema = new mongoose.Schema(
       required: true,
     },
     surname: {
-        type: String,
-        required: false,
-      },
+      type: String,
+      required: false,
+    },
     image: {
       type: String,
       required: true,
@@ -23,11 +23,11 @@ const PersonSchema = new mongoose.Schema(
       required: true,
     },
     region: {
-      type: Number,
+      type: String,
       required: true,
     },
     birthYear: {
-      type: Date,
+      type: Number,
       required: true,
     },
   },
