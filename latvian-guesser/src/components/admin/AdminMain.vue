@@ -19,6 +19,7 @@
             </div>
           </div>
         </div>
+        <router-view />
       </main>
       <Footer />
     </div>

@@ -39,15 +39,22 @@
     },
     methods: {
       updateHeaderContent(path) {
+        const isAdmin = localStorage.getItem('isAdmin') === 'true';
+
         if (path === '/' || path === '/login' || path === '/register') {
           this.pageTitle = 'UZMINI LATVIETI';
           this.navLinks = [];
           this.buttonText = 'Pieslēgties';
           this.showLogoutButton = false;
-        } else if (path.startsWith('/admin') || path.startsWith('/add') ) {
+        } else if (isAdmin && path === '/profile') {
+          this.pageTitle = 'Administrēšana';
+          this.navLinks = [{ text: 'Profils', href: '/profile' }];
+          this.buttonText = 'Izrakstīties';
+          this.showLogoutButton = true;
+        } else if (isAdmin && (path.startsWith('/admin') || path.startsWith('/add'))) {
           this.pageTitle = 'Administrēšana';
           this.navLinks = [
-            { text: 'Profils', href: '/admin/profile' },
+            { text: 'Profils', href: '/profile' },
           ];
           this.buttonText = 'Izrakstīties';
           this.showLogoutButton = true;
@@ -66,18 +73,22 @@
         if (this.buttonText === 'Pieslēgties') {
           this.$router.push('/login');
         } else {
-          localStorage.removeItem('token');
+          localStorage.clear();
           this.$router.push('/');
         }
       },
       handleTitleClick() {
-      const isLoggedIn = !!localStorage.getItem('token');
-      if (isLoggedIn) {
-        this.$router.push('/user');
-      } else {
-        this.$router.push('/');
+        const isLoggedIn = !!localStorage.getItem('token');
+        const isAdmin = localStorage.getItem('isAdmin') === 'true';
+
+        if (!isLoggedIn) {
+          this.$router.push('/');
+        } else if (isAdmin) {
+          this.$router.push('/admin');
+        } else {
+          this.$router.push('/user');
+        }
       }
-    },
     },
   };
 </script>

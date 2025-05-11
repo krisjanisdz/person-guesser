@@ -62,10 +62,18 @@
 
         const data = await res.json()
           if (data.token) {
-          localStorage.setItem('token', data.token);
-          this.success_message = 'Login successful!';
-          this.$router.push('/user');
-          console.log(data.token)
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('isAdmin', data.isAdmin);
+            localStorage.setItem('username', data.username);
+            localStorage.setItem('email', data.email);    
+
+            this.success_message = 'Login successful!';
+
+            if (data.isAdmin) {
+              this.$router.push('/add');  // Admin dashboard
+            } else {
+              this.$router.push('/user'); //  user dashboard
+            }
           } else if(data.message === "Invalid credentials"){
             this.success_message = "Nepareizs lietotājvārds un/vai parole";
           }
@@ -75,9 +83,13 @@
       navToRegister(){
         this.$router.push('/register');
       }
-      
+    },
+  mounted() {
+    if (localStorage.getItem('token')) {
+      this.$router.replace('/user');
     }
-  };
+  }
+};
   </script>
   
   <style scoped>
