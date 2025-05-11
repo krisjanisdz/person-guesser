@@ -2,7 +2,7 @@
     <div class="page">
       <Header />
       <main class="main">
-        <h1 class="welcome">Personības pievienošana</h1>
+        <h1 class="welcome">Kategorijas pievienošana</h1>
         <div class="fields">
           <form class="form">
             <div class="left">

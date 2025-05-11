@@ -77,8 +77,10 @@
           console.log(data);
 
           if (res.ok && data.token) {
-            // Save token and redirect
+            // Save credentials and redirect
             localStorage.setItem('token', data.token);
+            localStorage.setItem('username', this.username);
+            localStorage.setItem('email', this.email);
             this.$router.push('/user');
           } else {
             this.error_message = data.message || 'Reģistrācija neizdevās.';

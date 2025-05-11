@@ -78,19 +78,22 @@ const routes = [
   {
     path: '/add',
     name: 'Add',
-    children: [
-      {
-        path: 'person',
-        name: 'AddPerson',
-        component: AddPerson,
-      },
-      {
-        path: 'category',
-        name: 'AdCategory',
-        component: AddCategory,
-      },
-    ],
+    component: AdminMain,
+    meta: { requiresAuth: true, adminOnly: true }
   },
+  {
+    path: '/add/person',
+    name: 'AddPerson',
+    component: AddPerson,
+    meta: { requiresAuth: true, adminOnly: true }
+  },
+  {
+    path: '/add/category',
+    name: 'AddCategory',
+    component: AddCategory,
+    meta: { requiresAuth: true, adminOnly: true }
+  }
+
 ];
 
 const router = createRouter({
@@ -99,20 +102,24 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  if (to.meta.requiresAuth) {
-    const token = localStorage.getItem('token');
-    if (token) {
-      console.log(token)
-      // User is authenticated, proceed to the route
-      next();
-    } else {
-      // User is not authenticated, redirect to login
-      next('/login');
-    }
-  } else {
-    // Non-protected route, allow access
-    next();
+  
+  const token = localStorage.getItem('token');
+  const isAdmin = localStorage.getItem('isAdmin') === 'true';
+  
+  // Redirect logged-in users away from login/register
+  if ((to.path === '/login' || to.path === '/register') && token) {
+    return next(isAdmin ? '/add' : '/user');
   }
+  // Route requires auth
+  if (to.meta.requiresAuth && !token) {
+    return next('/login');
+  }
+  // Route is for admin only (optional)
+  if (to.meta.adminOnly && !isAdmin) {
+    return next('/user');
+  }
+  next();
 });
+
 
 export default router;

@@ -14,8 +14,20 @@ const PersonSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    description: {
+    gender: {
       type: String,
+      required: true,
+    },
+    career: {
+      type: String,
+      required: true,
+    },
+    region: {
+      type: Number,
+      required: true,
+    },
+    birthYear: {
+      type: Date,
       required: true,
     },
   },

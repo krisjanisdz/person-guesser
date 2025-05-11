@@ -53,8 +53,15 @@ app.post('/login', async (req, res) => {
     const passMatch = await bcrypt.compare(password, user.password);
     if (!passMatch) return res.status(401).json({ message: 'Invalid credentials' });
 
-    const token = jwt.sign({ userId: user._id }, secretKey);
-    res.json({ token, message: 'Login successful' });
+    const token = jwt.sign({ userId: user._id, isAdmin: user.isAdmin }, secretKey);
+    res.json({
+      token,
+      isAdmin: user.isAdmin,
+      username: user.username,
+      email: user.email,
+      message: 'Login successful'
+    });
+
 
   } catch (err) {
     console.error(err);
@@ -98,6 +105,73 @@ app.post('/register', async (req, res) => {
   }
 });
 
+app.post('/api/change-password', async (req, res) => {
+  try {
+    const { token, newPassword, confirmPassword } = req.body;
+
+    if (!token || !newPassword || !confirmPassword) {
+      return res.status(400).json({ message: 'Trūkst lauku vai autentifikācijas tokena!' });
+    }
+
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({ message: 'Paroles nesakrīt!' });
+    }
+
+    // Verify JWT token
+    const decoded = jwt.verify(token, secretKey);
+    const userId = decoded.userId;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'Lietotājs nav atrasts!' });
+    }
+
+    // Check if new password matches the old one
+    const isSamePassword = await bcrypt.compare(newPassword, user.password);
+    if (isSamePassword) {
+      return res.status(400).json({ message: 'Jaunā parole nedrīkst būt tāda pati kā vecā!' });
+    }
+
+    // Hash and update the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 11);
+    user.password = hashedPassword;
+    await user.save();
+
+    res.json({ message: 'Parole veiksmīgi nomainīta!', success: true });
+
+  } catch (err) {
+    console.error('Change password error:', err);
+    res.status(401).json({ message: 'Nederīgs token vai cita kļūda.' });
+  }
+});
+
+app.post('/api/delete-account', async (req, res) => {
+  try {
+    const { token } = req.body;
+
+    if (!token) {
+      return res.status(400).json({ message: 'Trūkst autentifikācijas tokena!' });
+    }
+
+    // verify jwt and get user id
+    const decoded = jwt.verify(token, secretKey);
+    const userId = decoded.userId;
+
+    // delete user from db
+    const deletedUser = await User.findByIdAndDelete(userId);
+
+    if (!deletedUser) {
+      return res.status(404).json({ message: 'Lietotājs nav atrasts vai jau dzēsts.' });
+    }
+
+    res.json({ message: 'Lietotāja konts veiksmīgi dzēsts.', success: true });
+
+  } catch (err) {
+    console.error('Dzēšanas kļūda:', err);
+    res.status(401).json({ message: 'Nederīgs token vai cita kļūda.' });
+  }
+});
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
@@ -110,7 +184,10 @@ const testPeople = [
       name: 'Raimonds',
       surname : 'Pauls',
       image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Raimonds_Pauls_2012.jpg/250px-Raimonds_Pauls_2012.jpg',
-      description: 'A famous Latvian composer and pianist, known for his contribution to Latvian and Soviet-era music.',
+      gender: 'Vīrietis',
+      career: 'Mūziķis',
+      region: 'Vidzeme',
+      birthYear: '1943-04-20',
     },
     {
       name: 'Kristaps',
